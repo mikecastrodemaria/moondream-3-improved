@@ -205,9 +205,8 @@ def point_objects(image, object_type):
         return None, "Please specify an object type!"
     
     try:
-        # Try to get multiple points with settings
-        settings = {"max_objects": 10}
-        result = model.point(image, object_type.strip(), settings=settings)
+        # Call point function (may return multiple points depending on model behavior)
+        result = model.point(image, object_type.strip())
         
         if isinstance(result, dict):
             points = result.get("points", [])
