@@ -3,7 +3,7 @@ module.exports = {
   version: "1.0.0",
   title: "Moondream3 Gradio UI",
   description: "A web interface for the Moondream3 vision-language model featuring image captioning, visual question answering, object detection, and object pointing.",
-  icon: "icon.png",
+  icon: "icon.jpg",
   menu: async (kernel, info) => {
     let installed = info.exists("env")
     let running = {
