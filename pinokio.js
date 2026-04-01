@@ -1,6 +1,6 @@
 const path = require('path')
 module.exports = {
-  version: "1.0.0",
+  version: "5.0",
   title: "Moondream3 Gradio UI",
   description: "A web interface for the Moondream3 vision-language model featuring image captioning, visual question answering, object detection, and object pointing.",
   icon: "icon.jpg",
