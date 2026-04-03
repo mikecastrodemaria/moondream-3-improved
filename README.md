@@ -59,7 +59,7 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu
 ### 4. Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r app/requirements.txt
 ```
 
 ## Usage
@@ -67,8 +67,10 @@ pip install -r requirements.txt
 ### Starting the Application
 
 ```bash
-python app.py
+python app/app.py
 ```
+
+Or from the `app` folder: `cd app` then `python app.py`.
 
 The application will start at `http://127.0.0.1:7860`.
 
