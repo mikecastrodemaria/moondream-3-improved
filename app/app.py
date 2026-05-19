@@ -4,10 +4,19 @@ Web interface for the Moondream3 vision-language model.
 """
 
 import os
+import sys
 import warnings
 
 os.environ["TORCH_COMPILE_DISABLE"] = "1"
 warnings.filterwarnings("ignore", category=UserWarning)
+
+# Force UTF-8 stdout/stderr so Unicode chars (✓ ⚠️ 🚀) don't crash the app
+# on Windows shells using cp1252 (e.g. inside Pinokio's bundled terminal).
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 import torch
 print(f"PyTorch version: {torch.__version__}")

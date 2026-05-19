@@ -7,6 +7,7 @@ module.exports = {
         venv: "env",
         env: {
           PYTHONUNBUFFERED: "1",
+          PYTHONIOENCODING: "utf-8",
           GRADIO_SERVER_NAME: "127.0.0.1"
         },
         path: "app",
