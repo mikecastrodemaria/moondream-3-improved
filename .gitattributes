@@ -1,0 +1,11 @@
+# Force LF line endings for shell scripts so they run on Mac/Linux
+# even when committed from a Windows machine.
+*.sh        text eol=lf
+*.bash      text eol=lf
+
+# Windows batch files keep CRLF
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+
+# Default: let git auto-handle text
+* text=auto

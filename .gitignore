@@ -22,3 +22,10 @@ env/
 commit_msg.txt
 *.log
 .DS_Store
+
+# Claude Code / AI assistant artifacts (not for public repo)
+CLAUDE.md
+.claude/
+**/.claude/
+FUTURE_FEATURES.md
+app/NOTES.md
