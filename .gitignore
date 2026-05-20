@@ -29,3 +29,6 @@ CLAUDE.md
 **/.claude/
 FUTURE_FEATURES.md
 app/NOTES.md
+
+# User-generated caption history
+app/caption_history.json

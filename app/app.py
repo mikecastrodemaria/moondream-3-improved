@@ -45,7 +45,65 @@ import gradio as gr
 from transformers import AutoModelForCausalLM
 from PIL import Image, ImageDraw
 
+import json
+import tempfile
+from datetime import datetime
+from pathlib import Path
+
 model = None
+
+HISTORY_PATH = Path(__file__).parent / "caption_history.json"
+HISTORY_MAX = 100
+
+
+def load_history():
+    try:
+        with open(HISTORY_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def format_history(entries):
+    if not entries:
+        return "(no captions yet)"
+    lines = []
+    for e in entries:
+        ts = e.get("timestamp", "")
+        length = e.get("length", "")
+        cap = e.get("caption", "")
+        lines.append(f"[{ts}] ({length})\n{cap}\n")
+    return "\n".join(lines)
+
+
+def append_history(caption, length):
+    caption = (caption or "").strip()
+    if not caption or caption.startswith("Error:") or caption.startswith("Please upload") or caption == "Model not loaded. Click 'Load Model' first.":
+        return format_history(load_history())
+    entries = load_history()
+    entries.insert(0, {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "length": length,
+        "caption": caption,
+    })
+    entries = entries[:HISTORY_MAX]
+    try:
+        with open(HISTORY_PATH, "w", encoding="utf-8") as f:
+            json.dump(entries, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Failed to save caption history: {e}")
+    return format_history(entries)
+
+
+def save_caption_as_txt(caption):
+    caption = (caption or "").strip()
+    if not caption:
+        return None
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    tmp = Path(tempfile.gettempdir()) / f"moondream_caption_{ts}.txt"
+    tmp.write_text(caption, encoding="utf-8")
+    return str(tmp)
 
 
 def load_model():
@@ -476,7 +534,33 @@ def point_objects(image, object_type):
 
 
 # Gradio interface
-with gr.Blocks(title="Moondream3 Vision AI", theme=gr.themes.Soft()) as demo:
+CUSTOM_CSS = """
+#caption-output-wrap { position: relative; }
+#caption-save-btn-wrap {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 20;
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 0 0 auto !important;
+  gap: 0 !important;
+}
+#caption-save-btn-wrap > * {
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 0 0 auto !important;
+}
+#caption-save-btn-wrap button {
+  padding: 2px 10px !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+"""
+
+with gr.Blocks(title="Moondream3 Vision AI", theme=gr.themes.Soft(), css=CUSTOM_CSS) as demo:
     gr.Markdown(
         """
         # 🌙 Moondream3 Vision AI
@@ -507,12 +591,38 @@ with gr.Blocks(title="Moondream3 Vision AI", theme=gr.themes.Soft()) as demo:
                         caption_stream = gr.Checkbox(label="Stream Output", value=False)
                     caption_btn = gr.Button("Generate Caption", variant="primary")
                 with gr.Column():
-                    caption_output = gr.Textbox(label="Caption", lines=5)
+                    with gr.Column(elem_id="caption-output-wrap"):
+                        caption_output = gr.Textbox(label="Caption", lines=5)
+                        with gr.Row(elem_id="caption-save-btn-wrap"):
+                            caption_save_btn = gr.Button("💾 Save as .txt", size="sm", min_width=0, scale=0)
+                    caption_save_file = gr.File(label="Download", visible=False, interactive=False)
+                    caption_history_display = gr.Textbox(
+                        label=f"History (last {HISTORY_MAX})",
+                        value=format_history(load_history()),
+                        lines=12,
+                        max_lines=12,
+                        interactive=False,
+                        show_copy_button=True,
+                    )
 
             caption_btn.click(
                 fn=caption_image,
                 inputs=[caption_image_input, caption_length, caption_temperature, caption_max_tokens, caption_stream],
                 outputs=caption_output,
+            ).then(
+                fn=append_history,
+                inputs=[caption_output, caption_length],
+                outputs=caption_history_display,
+            )
+
+            caption_save_btn.click(
+                fn=save_caption_as_txt,
+                inputs=caption_output,
+                outputs=caption_save_file,
+            ).then(
+                fn=lambda f: gr.update(visible=bool(f)),
+                inputs=caption_save_file,
+                outputs=caption_save_file,
             )
 
         with gr.TabItem("❓ Visual Q&A"):
