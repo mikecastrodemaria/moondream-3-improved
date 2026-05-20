@@ -11,6 +11,7 @@ A polished, batch-ready web interface for the [Moondream3](https://huggingface.c
 | | Feature | Notes |
 |-|---------|-------|
 | 📁 | **Batch Caption tab** | Process a whole folder of images from inside the UI — folder path **+** drag-and-drop hybrid, optional output folder, choice of caption length, overwrite toggle, live progress log. |
+| 🗂️ | **Caption history + Save-as-txt** | Every generated caption is appended to a persistent history panel (last 100, stored in `app/caption_history.json`), and a small 💾 button overlays the caption output to export the current caption as a downloadable `.txt`. |
 | 🛠️ | **CLI batch captioner** | `batch_caption.py` + Windows `.bat` / Unix `.sh` wrappers for headless / scripted use. Sidecar `.txt` next to each image, skip-if-exists, offline by default. |
 | 💾 | **HuggingFace Cache panel** | New "💾 HF Cache" tab: shows active cache path, whether weights are cached, total cache size, offline status. Toggle `HF_HUB_OFFLINE`, override `HF_HOME`, open the cache folder, refresh — all from the browser. |
 | 🚀 | **Standalone launchers** | Cross-platform `install.sh` / `start.sh` / `install.bat` / `start.bat` in `app/` — auto-detect platform (CUDA on Linux, MPS/CPU on macOS) and manage a local venv. No Pinokio required. |
@@ -21,7 +22,7 @@ A polished, batch-ready web interface for the [Moondream3](https://huggingface.c
 
 ## Features
 
-- **📝 Image Captioning** — short, normal, or long captions with optional token-by-token streaming
+- **📝 Image Captioning** — short, normal, or long captions with optional token-by-token streaming, persistent history of the last 100 captions, and a 💾 one-click `.txt` export
 - **❓ Visual Q&A** — ask questions about an image with reasoning mode (also supports text-only queries)
 - **🔍 Object Detection** — find and box objects by name with adjustable max-objects
 - **👆 Object Pointing** — pinpoint objects with circular markers
